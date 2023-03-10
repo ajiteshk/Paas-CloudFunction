@@ -194,7 +194,7 @@ public class HelloWorld implements HttpFunction {
 
                 // store each object in JSONObject
                 JSONObject explrObject = channels.getJSONObject(i);
-
+                System.out.println("explrObject is ---------------- " + explrObject);
                 String defaultVersion = (String) explrObject.get("defaultVersion");
                 if (explrObject.get("channel").equals("RAPID")) {
                     addToGkeVersionSet(explrObject, rapidVersionMap, defaultVersion);
@@ -212,14 +212,17 @@ public class HelloWorld implements HttpFunction {
             String defaultVersion) {
         JSONArray validVersions = explrObject.getJSONArray("validVersions");
         String validVersion = null;
-
+                System.out.println("validVersions is "+ validVersions);
+                System.out.println("validVersions.length() is "+ validVersions.length());
         for (int j = 0; j < validVersions.length(); j++) {
             Boolean defaultVer = null;
             validVersion = (String) validVersions.get(j);
-
+            System.out.println("validVersion is "+ validVersion);
+            
             if (validVersion.equals(defaultVersion)) {
                 defaultVer = true;
             }
+            System.out.println("defaultVersion is "+ defaultVersion);
             versionMap.put(validVersion, defaultVer);
         }
     }
@@ -234,7 +237,7 @@ public class HelloWorld implements HttpFunction {
         ListClustersResponse response = request.execute();
         List<Map<String, Object>> rowList = new ArrayList<>();
         if (response != null && !response.isEmpty()) {
-            // System.out.println(response);
+             System.out.println("response is ---- "+response);
 
             for (Cluster cluster : response.getClusters()) {
                 Map<String, Object> rowContent = new HashMap<>();
@@ -253,22 +256,17 @@ public class HelloWorld implements HttpFunction {
                     JSONObject releaseChannelJson = jsonObject.getJSONObject("releaseChannel");
                     System.out.println("releaseChannel" + releaseChannelJson);
 
-                    String releaseChannel = null;
-
-                    if (jsonObject != null && !jsonObject.isNull("channel")) {
-                        releaseChannel = releaseChannelJson.getString("channel");
-                        System.out.println("Release Channel is" + releaseChannel);
-                        if (releaseChannel.equals("REGULAR")) {
+                    
+                        System.out.println("Release Channel is" + releaseChannelJson);
+                        if (releaseChannelJson.toString().contains("REGULAR")) {
                             validVersions = getValidVersions(currentMasterVersion, regularVersionMap);
-                        } else if (releaseChannel.equals("RAPID")) {
+                        } else if (releaseChannelJson.toString().contains("RAPID")) {
                             validVersions = getValidVersions(currentMasterVersion, rapidVersionMap);
-                        } else if (releaseChannel.equals("STABLE")) {
+                        } else if (releaseChannelJson.toString().contains("STABLE")) {
                             validVersions = getValidVersions(currentMasterVersion, stableVersionMap);
-                        }
-                    }
+                        } 
 
                 }
-
                 if (gkeVersionMap.containsKey(projectId + name)) {
                     if (gkeVersionMap.get(projectId + name).equals(currentMasterVersion + "$" + currentNodeVersion)) {
                         hasEntry = true;
